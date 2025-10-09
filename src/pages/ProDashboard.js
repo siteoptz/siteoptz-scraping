@@ -219,7 +219,7 @@ const ProDashboard = () => {
         <div className="actions-grid">
           <button 
             className="action-button primary"
-            onClick={() => window.location.href = '/ai-seo'}
+            onClick={() => window.location.href = '/dashboard/pro/aiseo'}
           >
             🚀 Analytics Suite
           </button>
