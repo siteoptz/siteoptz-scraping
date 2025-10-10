@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useStripe } from '../contexts/StripeContext';
 import { pricingPlans, upgradeFeatures } from '../pricing-plans';
 import './DashboardPage.css';
 
 const ProDashboard = () => {
-  const navigate = useNavigate();
   const { openUpgradeModal } = useStripe();
   const [isUpgrading, setIsUpgrading] = useState(false);
 
@@ -105,13 +103,13 @@ const ProDashboard = () => {
         <p style={{ color: '#6b7280', marginBottom: '1.5rem' }}>
           Unlock powerful AI-driven SEO and analytics tools to supercharge your business growth.
         </p>
-        <button 
+        <a 
+          href="/dashboard/pro/aiseo"
           className="action-button primary"
-          onClick={() => navigate('/dashboard/pro/aiseo')}
-          style={{ width: '100%' }}
+          style={{ width: '100%', display: 'block', textAlign: 'center', textDecoration: 'none' }}
         >
           Launch Analytics Suite
-        </button>
+        </a>
       </div>
 
       {/* Advanced Features */}
@@ -183,12 +181,13 @@ const ProDashboard = () => {
           </div>
         </div>
         <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
-          <button 
+          <a 
+            href="/dashboard/pro/aiseo"
             className="action-button primary"
-            onClick={() => navigate('/dashboard/pro/aiseo')}
+            style={{ display: 'inline-block', textDecoration: 'none' }}
           >
             📊 Access Advanced Analytics
-          </button>
+          </a>
         </div>
       </div>
 
@@ -219,12 +218,13 @@ const ProDashboard = () => {
       <div className="quick-actions">
         <h2>Quick Actions</h2>
         <div className="actions-grid">
-          <button 
+          <a 
+            href="/dashboard/pro/aiseo"
             className="action-button primary"
-            onClick={() => navigate('/dashboard/pro/aiseo')}
+            style={{ display: 'inline-block', textDecoration: 'none' }}
           >
             🚀 Analytics Suite
-          </button>
+          </a>
           <button className="action-button secondary">
             Create JavaScript Job
           </button>
