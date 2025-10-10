@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import AuthenticationService from '../services/AuthenticationService';
 
 const UserContext = createContext();
 
@@ -16,51 +17,55 @@ export const UserProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check for SSO token in URL to get user plan
+    // Load user from session or SSO token
     const loadUser = async () => {
       try {
-        // Check URL for SSO token
-        const urlParams = new URLSearchParams(window.location.search);
-        const ssoToken = urlParams.get('sso_token');
+        // First check for existing session
+        const sessionUser = AuthenticationService.getCurrentUser();
         
-        let userData = {
-          id: 'user_123',
-          email: 'user@example.com',
-          name: 'John Doe',
-          plan: 'free',
-          subscription: null
-        };
-        
-        if (ssoToken) {
+        if (sessionUser) {
+          // Verify user is still valid in GHL
           try {
-            // Decode the SSO token to get user info
-            const tokenData = JSON.parse(atob(ssoToken.split('.')[0]));
-            userData = {
-              id: tokenData.userId || 'user_123',
-              email: tokenData.email || 'user@example.com',
-              name: tokenData.name || 'John Doe',
-              plan: tokenData.plan || 'pro', // Default to pro if they have SSO token
-              subscription: null
-            };
-            
-            // Store in localStorage for persistence
-            localStorage.setItem('userPlan', userData.plan);
-            localStorage.setItem('userEmail', userData.email);
-          } catch (e) {
-            console.log('Could not parse SSO token:', e);
+            const verification = await AuthenticationService.verifyUserInGHL(sessionUser.email);
+            if (verification.exists) {
+              setUser(verification.user);
+              setCurrentPlan(verification.user.plan);
+              AuthenticationService.storeUserSession(verification.user);
+            } else {
+              // User no longer exists - clear session
+              AuthenticationService.clearUserSession();
+              setUser(null);
+              setCurrentPlan('free');
+            }
+          } catch (error) {
+            console.error('User verification failed:', error);
+            // Use cached data if verification fails
+            setUser(sessionUser);
+            setCurrentPlan(sessionUser.plan);
           }
         } else {
-          // Check localStorage for saved plan
-          const savedPlan = localStorage.getItem('userPlan');
-          const savedEmail = localStorage.getItem('userEmail');
-          if (savedPlan) {
-            userData.plan = savedPlan;
-            userData.email = savedEmail || userData.email;
+          // Check URL for SSO token (OAuth callback or GHL redirect)
+          const urlParams = new URLSearchParams(window.location.search);
+          const ssoToken = urlParams.get('sso_token');
+          
+          if (ssoToken) {
+            try {
+              // Decode the SSO token to get user info
+              const tokenData = JSON.parse(atob(ssoToken));
+              
+              // Verify user in GHL
+              const verification = await AuthenticationService.verifyUserInGHL(tokenData.email);
+              
+              if (verification.exists) {
+                setUser(verification.user);
+                setCurrentPlan(verification.user.plan);
+                AuthenticationService.storeUserSession(verification.user);
+              }
+            } catch (e) {
+              console.log('Could not parse SSO token:', e);
+            }
           }
         }
-        
-        setUser(userData);
-        setCurrentPlan(userData.plan);
       } catch (error) {
         console.error('Error loading user:', error);
       } finally {
@@ -69,6 +74,26 @@ export const UserProvider = ({ children }) => {
     };
 
     loadUser();
+
+    // Listen for authentication events
+    const handleUserAuthenticated = (event) => {
+      const userData = event.detail;
+      setUser(userData);
+      setCurrentPlan(userData.plan);
+    };
+
+    const handleUserLoggedOut = () => {
+      setUser(null);
+      setCurrentPlan('free');
+    };
+
+    window.addEventListener('userAuthenticated', handleUserAuthenticated);
+    window.addEventListener('userLoggedOut', handleUserLoggedOut);
+
+    return () => {
+      window.removeEventListener('userAuthenticated', handleUserAuthenticated);
+      window.removeEventListener('userLoggedOut', handleUserLoggedOut);
+    };
   }, []);
 
   const upgradePlan = async (newPlan) => {

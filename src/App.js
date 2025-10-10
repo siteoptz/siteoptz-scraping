@@ -9,6 +9,9 @@ import ProDashboard from './pages/ProDashboard';
 import EnterpriseDashboard from './pages/EnterpriseDashboard';
 import SuccessPage from './pages/SuccessPage';
 import AISEOProtected from './components/AISEOProtected';
+import LoginForm from './components/LoginForm';
+import GetStartedForm from './components/GetStartedForm';
+import PlanProtectedRoute from './components/PlanProtectedRoute';
 import './App.css';
 
 function App() {
@@ -18,32 +21,51 @@ function App() {
         <Router>
           <div className="App">
             <Routes>
-              {/* Dashboard Routes */}
+              {/* Authentication Routes */}
+              <Route path="/login" element={<LoginForm />} />
+              <Route path="/get-started" element={<GetStartedForm />} />
+              
+              {/* Dashboard Routes with Plan Protection */}
               <Route path="/dashboard" element={<Navigate to="/dashboard/free" replace />} />
+              
               <Route path="/dashboard/free" element={
-                <DashboardLayout plan="free">
-                  <FreeDashboard />
-                </DashboardLayout>
+                <PlanProtectedRoute requiredPlan="free">
+                  <DashboardLayout plan="free">
+                    <FreeDashboard />
+                  </DashboardLayout>
+                </PlanProtectedRoute>
               } />
+              
               <Route path="/dashboard/starter" element={
-                <DashboardLayout plan="starter">
-                  <StarterDashboard />
-                </DashboardLayout>
+                <PlanProtectedRoute requiredPlan="starter">
+                  <DashboardLayout plan="starter">
+                    <StarterDashboard />
+                  </DashboardLayout>
+                </PlanProtectedRoute>
               } />
+              
               <Route path="/dashboard/pro" element={
-                <DashboardLayout plan="pro">
-                  <ProDashboard />
-                </DashboardLayout>
+                <PlanProtectedRoute requiredPlan="pro">
+                  <DashboardLayout plan="pro">
+                    <ProDashboard />
+                  </DashboardLayout>
+                </PlanProtectedRoute>
               } />
+              
               <Route path="/dashboard/pro/aiseo" element={
-                <DashboardLayout plan="pro">
-                  <AISEOProtected />
-                </DashboardLayout>
+                <PlanProtectedRoute requiredPlan="pro">
+                  <DashboardLayout plan="pro">
+                    <AISEOProtected />
+                  </DashboardLayout>
+                </PlanProtectedRoute>
               } />
+              
               <Route path="/dashboard/enterprise" element={
-                <DashboardLayout plan="enterprise">
-                  <EnterpriseDashboard />
-                </DashboardLayout>
+                <PlanProtectedRoute requiredPlan="enterprise">
+                  <DashboardLayout plan="enterprise">
+                    <EnterpriseDashboard />
+                  </DashboardLayout>
+                </PlanProtectedRoute>
               } />
               
               {/* Success/Cancel Pages */}
@@ -53,8 +75,8 @@ function App() {
               {/* Legacy AI SEO route - redirects to new location */}
               <Route path="/ai-seo" element={<Navigate to="/dashboard/pro/aiseo" replace />} />
               
-              {/* Default redirect */}
-              <Route path="/" element={<Navigate to="/dashboard/free" replace />} />
+              {/* Default redirect - go to login if not authenticated */}
+              <Route path="/" element={<Navigate to="/login" replace />} />
             </Routes>
           </div>
         </Router>
