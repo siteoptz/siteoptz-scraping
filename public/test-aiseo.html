@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test AI SEO Navigation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 50px;
+            background: #000;
+            color: #fff;
+        }
+        .test-links {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        a, button {
+            padding: 15px 30px;
+            background: #10b981;
+            color: white;
+            text-decoration: none;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            text-align: center;
+            display: block;
+        }
+        a:hover, button:hover {
+            background: #0ea571;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .info {
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test AI SEO Navigation</h1>
+    
+    <div class="info">
+        <p>This is a test page to verify navigation to the AI SEO dashboard.</p>
+        <p>Current URL: <strong id="current-url"></strong></p>
+    </div>
+    
+    <div class="test-links">
+        <h2>Test Links:</h2>
+        
+        <a href="/dashboard/pro/aiseo">
+            Direct Link: /dashboard/pro/aiseo
+        </a>
+        
+        <a href="https://optz.siteoptz.ai/dashboard/pro/aiseo">
+            Full URL: https://optz.siteoptz.ai/dashboard/pro/aiseo
+        </a>
+        
+        <button onclick="window.location.href='/dashboard/pro/aiseo'">
+            Button with window.location.href
+        </button>
+        
+        <button onclick="window.location.replace('/dashboard/pro/aiseo')">
+            Button with window.location.replace
+        </button>
+        
+        <button onclick="window.location.assign('/dashboard/pro/aiseo')">
+            Button with window.location.assign
+        </button>
+        
+        <button onclick="directNavigate()">
+            Button with JavaScript function
+        </button>
+    </div>
+    
+    <script>
+        // Display current URL
+        document.getElementById('current-url').textContent = window.location.href;
+        
+        // Direct navigation function
+        function directNavigate() {
+            console.log('Navigating to /dashboard/pro/aiseo');
+            window.location.pathname = '/dashboard/pro/aiseo';
+        }
+        
+        // Log all clicks for debugging
+        document.querySelectorAll('a, button').forEach(element => {
+            element.addEventListener('click', (e) => {
+                console.log('Clicked:', element.textContent.trim());
+                console.log('Target:', element.href || element.onclick);
+            });
+        });
+    </script>
+</body>
+</html>
