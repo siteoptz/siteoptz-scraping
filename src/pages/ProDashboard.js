@@ -6,6 +6,22 @@ import './DashboardPage.css';
 const ProDashboard = () => {
   const { openUpgradeModal } = useStripe();
   const [isUpgrading, setIsUpgrading] = useState(false);
+  
+  // Force navigation to AI SEO - bypass everything
+  React.useEffect(() => {
+    const handleAISEOClick = (e) => {
+      if (e.target.closest('[data-aiseo-link]')) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        window.location.pathname = '/dashboard/pro/aiseo';
+        return false;
+      }
+    };
+    
+    document.addEventListener('click', handleAISEOClick, true);
+    return () => document.removeEventListener('click', handleAISEOClick, true);
+  }, []);
 
   const handleUpgrade = async () => {
     setIsUpgrading(true);
@@ -105,6 +121,7 @@ const ProDashboard = () => {
         </p>
         <a 
           href="/dashboard/pro/aiseo"
+          data-aiseo-link="true"
           className="action-button primary"
           style={{ width: '100%', display: 'block', textAlign: 'center', textDecoration: 'none' }}
         >
@@ -183,6 +200,7 @@ const ProDashboard = () => {
         <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
           <a 
             href="/dashboard/pro/aiseo"
+          data-aiseo-link="true"
             className="action-button primary"
             style={{ display: 'inline-block', textDecoration: 'none' }}
           >
@@ -220,6 +238,7 @@ const ProDashboard = () => {
         <div className="actions-grid">
           <a 
             href="/dashboard/pro/aiseo"
+          data-aiseo-link="true"
             className="action-button primary"
             style={{ display: 'inline-block', textDecoration: 'none' }}
           >
