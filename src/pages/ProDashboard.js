@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useStripe } from '../contexts/StripeContext';
 import { pricingPlans, upgradeFeatures } from '../pricing-plans';
 import './DashboardPage.css';
 
 const ProDashboard = () => {
+  const navigate = useNavigate();
   const { openUpgradeModal } = useStripe();
   const [isUpgrading, setIsUpgrading] = useState(false);
 
@@ -105,7 +107,7 @@ const ProDashboard = () => {
         </p>
         <button 
           className="action-button primary"
-          onClick={() => window.location.href = '/dashboard/pro/aiseo'}
+          onClick={() => navigate('/dashboard/pro/aiseo')}
           style={{ width: '100%' }}
         >
           Launch Analytics Suite
@@ -183,7 +185,7 @@ const ProDashboard = () => {
         <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
           <button 
             className="action-button primary"
-            onClick={() => window.location.href = '/dashboard/pro/aiseo'}
+            onClick={() => navigate('/dashboard/pro/aiseo')}
           >
             📊 Access Advanced Analytics
           </button>
@@ -219,7 +221,7 @@ const ProDashboard = () => {
         <div className="actions-grid">
           <button 
             className="action-button primary"
-            onClick={() => window.location.href = '/dashboard/pro/aiseo'}
+            onClick={() => navigate('/dashboard/pro/aiseo')}
           >
             🚀 Analytics Suite
           </button>
