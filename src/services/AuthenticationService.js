@@ -9,6 +9,37 @@ class AuthenticationService {
     this.ghlApiUrl = process.env.REACT_APP_GHL_API_URL;
     this.ghlApiKey = process.env.REACT_APP_GHL_API_KEY;
     this.ghlLocationId = process.env.REACT_APP_GHL_LOCATION_ID;
+    
+    // Check if required credentials are configured
+    if (!this.ghlApiUrl || !this.ghlApiKey || !this.ghlLocationId) {
+      console.error('WARNING: Go High Level API credentials are not configured.');
+      console.error('Please add REACT_APP_GHL_API_URL, REACT_APP_GHL_API_KEY, and REACT_APP_GHL_LOCATION_ID to your .env file');
+    }
+    
+    // Clear any potentially problematic cached data on initialization
+    this.clearProblematicCache();
+  }
+
+  /**
+   * Clear any cached data that might cause external redirects
+   */
+  clearProblematicCache() {
+    const problematicKeys = [
+      'redirectUrl',
+      'pendingRedirect', 
+      'authRedirect',
+      'dashboardUrl',
+      'externalRedirect',
+      'siteoptz_redirect',
+      'optz_redirect'
+    ];
+    
+    problematicKeys.forEach(key => {
+      if (localStorage.getItem(key)) {
+        console.log(`🧹 Removing problematic cache key: ${key}`);
+        localStorage.removeItem(key);
+      }
+    });
   }
 
   /**
@@ -17,6 +48,11 @@ class AuthenticationService {
    * @returns {Promise<{exists: boolean, user: object|null}>}
    */
   async verifyUserInGHL(email) {
+    // Check if GHL credentials are configured
+    if (!this.ghlApiUrl || !this.ghlApiKey || !this.ghlLocationId) {
+      throw new Error('Go High Level API is not configured. Please contact support.');
+    }
+    
     try {
       const response = await fetch(`${this.ghlApiUrl}/contacts/lookup`, {
         method: 'POST',
@@ -113,6 +149,16 @@ class AuthenticationService {
    */
   async handleLogin(email, password = null, authMethod = 'email') {
     try {
+      // Check if GHL credentials are configured
+      if (!this.ghlApiUrl || !this.ghlApiKey || !this.ghlLocationId || 
+          this.ghlApiKey.includes('YOUR_') || this.ghlLocationId.includes('YOUR_')) {
+        return {
+          success: false,
+          message: 'Authentication system is not configured. Please contact support.',
+          redirect: null
+        };
+      }
+
       // Verify user exists in GHL
       const verification = await this.verifyUserInGHL(email);
       
@@ -159,6 +205,16 @@ class AuthenticationService {
   async handleGetStarted(userData) {
     try {
       const { email, name, password, authMethod = 'email' } = userData;
+      
+      // Check if GHL credentials are configured
+      if (!this.ghlApiUrl || !this.ghlApiKey || !this.ghlLocationId || 
+          this.ghlApiKey.includes('YOUR_') || this.ghlLocationId.includes('YOUR_')) {
+        return {
+          success: false,
+          message: 'Authentication system is not configured. Please contact support.',
+          redirect: null
+        };
+      }
       
       // First check if user already exists
       const verification = await this.verifyUserInGHL(email);
@@ -207,6 +263,11 @@ class AuthenticationService {
    * @returns {Promise<object>} - Created user object
    */
   async createUserInGHL(userData) {
+    // Check if GHL credentials are configured
+    if (!this.ghlApiUrl || !this.ghlApiKey || !this.ghlLocationId) {
+      throw new Error('Go High Level API is not configured. Cannot create account.');
+    }
+    
     try {
       const { email, name, plan = 'free', authMethod } = userData;
       
@@ -332,6 +393,7 @@ class AuthenticationService {
    * Clear user session (logout)
    */
   clearUserSession() {
+    console.log('🔄 Clearing user session data...');
     localStorage.removeItem('userPlan');
     localStorage.removeItem('userEmail');
     localStorage.removeItem('userId');
@@ -339,6 +401,12 @@ class AuthenticationService {
     localStorage.removeItem('ghlContactId');
     localStorage.removeItem('ssoToken');
     
+    // Clear any cached redirect URLs that might be causing external redirects
+    localStorage.removeItem('redirectUrl');
+    localStorage.removeItem('pendingRedirect');
+    localStorage.removeItem('authRedirect');
+    
+    console.log('✅ User session cleared');
     window.dispatchEvent(new CustomEvent('userLoggedOut'));
   }
 

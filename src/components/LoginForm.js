@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+// Login Form Component
+// Handles user authentication and redirects to appropriate dashboard
+
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import AuthenticationService from '../services/AuthenticationService';
-import './LoginForm.css';
+import GHLAuthService from '../services/GHLAuthService';
+import './AuthForms.css';
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -11,86 +14,167 @@ const LoginForm = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [redirectMessage, setRedirectMessage] = useState(null);
+  const [showMessage, setShowMessage] = useState(null);
+
+  useEffect(() => {
+    // Check if already authenticated
+    if (GHLAuthService.isAuthenticated()) {
+      const user = GHLAuthService.getCurrentUser();
+      navigate(`/dashboard/${user.plan}`);
+    }
+  }, [navigate]);
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
-    setError(null);
-    setRedirectMessage(null);
+    // Clear errors when user starts typing
+    if (error) setError(null);
+    if (showMessage) setShowMessage(null);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    setRedirectMessage(null);
+    setShowMessage(null);
 
     try {
-      const result = await AuthenticationService.handleLogin(
+      // Validate inputs
+      if (!formData.email || !formData.password) {
+        setError('Please enter both email and password');
+        setLoading(false);
+        return;
+      }
+
+      // Attempt login
+      const result = await GHLAuthService.loginWithEmail(
         formData.email,
-        formData.password,
-        'email'
+        formData.password
       );
 
       if (result.success) {
-        // Successful login - redirect to appropriate dashboard
-        navigate(result.redirect);
-      } else if (result.action === 'REDIRECT_TO_SIGNUP') {
-        // User not found - show message and redirect option
-        setRedirectMessage(result.message);
-        setTimeout(() => {
-          navigate('/get-started');
-        }, 3000);
+        // Login successful - redirect to user's dashboard
+        console.log('✅ Redirecting to:', result.redirectTo);
+        navigate(result.redirectTo);
       } else {
-        setError(result.message);
+        // Login failed - show appropriate message
+        if (result.error === 'user_not_found') {
+          // User doesn't exist - show message and offer Get Started
+          setShowMessage({
+            type: 'info',
+            title: 'Account Not Found',
+            text: result.message,
+            action: {
+              label: 'Create Account',
+              onClick: () => navigate('/get-started', {
+                state: { email: formData.email }
+              })
+            }
+          });
+        } else if (result.error === 'invalid_password') {
+          setError('Incorrect password. Please try again.');
+        } else {
+          setError(result.message || 'Login failed. Please try again.');
+        }
       }
+
     } catch (error) {
-      setError('An unexpected error occurred. Please try again.');
       console.error('Login error:', error);
+      setError('An unexpected error occurred. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleOAuthLogin = async (provider) => {
-    setLoading(true);
-    setError(null);
-    
+  const handleOAuthLogin = async () => {
     try {
-      // Initiate OAuth flow
-      // This would typically redirect to the OAuth provider
-      window.location.href = `/api/auth/${provider}`;
+      setLoading(true);
+      await GHLAuthService.initiateOAuth();
     } catch (error) {
-      setError(`Failed to login with ${provider}`);
+      console.error('OAuth error:', error);
+      setError('Failed to initiate OAuth. Please try again.');
+      setLoading(false);
+    }
+  };
+
+  const handleMagicLink = async () => {
+    if (!formData.email) {
+      setError('Please enter your email address');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const result = await GHLAuthService.sendMagicLink(formData.email);
+      
+      if (result.success) {
+        setShowMessage({
+          type: 'success',
+          title: 'Magic Link Sent!',
+          text: 'Check your email for a login link. It expires in 15 minutes.'
+        });
+      } else {
+        if (result.error === 'user_not_found') {
+          setShowMessage({
+            type: 'info',
+            title: 'Account Not Found',
+            text: result.message,
+            action: {
+              label: 'Create Account',
+              onClick: () => navigate('/get-started')
+            }
+          });
+        } else {
+          setError(result.message);
+        }
+      }
+    } catch (error) {
+      setError('Failed to send magic link. Please try again.');
+    } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="login-form-container">
-      <div className="login-form-card">
-        <h2>Log In to SiteOptz</h2>
-        <p className="form-subtitle">Welcome back! Please enter your credentials.</p>
+    <div className="auth-container">
+      <div className="auth-card">
+        <div className="auth-header">
+          <h1>Welcome Back</h1>
+          <p>Sign in to access your dashboard</p>
+        </div>
+
+        {showMessage && (
+          <div className={`message-box ${showMessage.type}`}>
+            <div className="message-icon">
+              {showMessage.type === 'info' && 'ℹ️'}
+              {showMessage.type === 'success' && '✅'}
+              {showMessage.type === 'error' && '❌'}
+            </div>
+            <div className="message-content">
+              <h3>{showMessage.title}</h3>
+              <p>{showMessage.text}</p>
+              {showMessage.action && (
+                <button 
+                  className="message-action-btn"
+                  onClick={showMessage.action.onClick}
+                >
+                  {showMessage.action.label} →
+                </button>
+              )}
+            </div>
+          </div>
+        )}
 
         {error && (
-          <div className="error-message">
+          <div className="error-box">
             <span className="error-icon">⚠️</span>
-            {error}
+            <span>{error}</span>
           </div>
         )}
 
-        {redirectMessage && (
-          <div className="redirect-message">
-            <span className="redirect-icon">ℹ️</span>
-            {redirectMessage}
-            <div className="redirect-timer">Redirecting to Get Started...</div>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
             <label htmlFor="email">Email Address</label>
             <input
@@ -99,8 +183,8 @@ const LoginForm = () => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              required
               placeholder="you@example.com"
+              required
               disabled={loading}
             />
           </div>
@@ -113,54 +197,106 @@ const LoginForm = () => {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              required
               placeholder="Enter your password"
+              required
               disabled={loading}
             />
           </div>
 
           <button 
             type="submit" 
-            className="submit-button"
+            className="btn-primary"
             disabled={loading}
           >
-            {loading ? 'Logging in...' : 'Log In'}
+            {loading ? (
+              <span className="loading-spinner">🔄 Signing in...</span>
+            ) : (
+              'Sign In'
+            )}
           </button>
         </form>
 
-        <div className="oauth-divider">
-          <span>OR</span>
+        <div className="auth-divider">
+          <span>or</span>
         </div>
 
-        <div className="oauth-buttons">
-          <button
-            className="oauth-button google"
-            onClick={() => handleOAuthLogin('google')}
+        <div className="alternative-auth">
+          <button 
+            type="button"
+            className="btn-oauth"
+            onClick={handleOAuthLogin}
             disabled={loading}
           >
-            <span className="oauth-icon">G</span>
-            Continue with Google
+            <span className="oauth-icon">🔐</span>
+            Sign in with GoHighLevel
           </button>
-          
-          <button
-            className="oauth-button github"
-            onClick={() => handleOAuthLogin('github')}
-            disabled={loading}
+
+          <button 
+            type="button"
+            className="btn-magic-link"
+            onClick={handleMagicLink}
+            disabled={loading || !formData.email}
           >
-            <span className="oauth-icon">GH</span>
-            Continue with GitHub
+            <span className="magic-icon">✨</span>
+            Send Magic Link
           </button>
         </div>
 
-        <div className="form-footer">
+        <div className="auth-footer">
           <p>
-            New to SiteOptz? 
-            <a href="/get-started" className="link">Get Started</a>
+            Don't have an account?{' '}
+            <button 
+              className="link-button"
+              onClick={() => navigate('/get-started')}
+            >
+              Get Started
+            </button>
           </p>
-          <p>
-            <a href="/forgot-password" className="link">Forgot Password?</a>
-          </p>
+          <button 
+            className="link-button forgot-password"
+            onClick={() => setShowMessage({
+              type: 'info',
+              title: 'Reset Password',
+              text: 'Enter your email above and click "Send Magic Link" to reset your password.'
+            })}
+          >
+            Forgot password?
+          </button>
         </div>
+      </div>
+
+      <div className="auth-features">
+        <h3>Why SiteOptz.ai?</h3>
+        <ul>
+          <li>
+            <span className="feature-icon">🤖</span>
+            <div>
+              <strong>AI-Powered SEO</strong>
+              <p>Deliver enterprise-grade SEO with 90% automation</p>
+            </div>
+          </li>
+          <li>
+            <span className="feature-icon">💰</span>
+            <div>
+              <strong>60-80% Profit Margins</strong>
+              <p>Keep more of what you earn with AI efficiency</p>
+            </div>
+          </li>
+          <li>
+            <span className="feature-icon">📈</span>
+            <div>
+              <strong>Scale Unlimited</strong>
+              <p>Handle 50+ clients without hiring</p>
+            </div>
+          </li>
+          <li>
+            <span className="feature-icon">⚡</span>
+            <div>
+              <strong>10x Faster Delivery</strong>
+              <p>Complete monthly work in minutes, not weeks</p>
+            </div>
+          </li>
+        </ul>
       </div>
     </div>
   );

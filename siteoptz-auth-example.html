@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SiteOptz.ai - Authentication Example</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .nav-btn {
+            padding: 0.75rem 2rem;
+            background: white;
+            color: #667eea;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .dashboard-links {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .dashboard-links h2 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .dashboard-card {
+            padding: 1.5rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            text-align: center;
+            transition: border-color 0.3s, background 0.3s;
+        }
+
+        .dashboard-card:hover {
+            border-color: #667eea;
+            background: #f9fafb;
+        }
+
+        .dashboard-card h3 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-card p {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .dashboard-card a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .dashboard-card a:hover {
+            text-decoration: underline;
+        }
+
+        .user-info {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .user-info.active {
+            display: block;
+        }
+
+        .user-info h4 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .user-info p {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .logout-btn {
+            margin-top: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .logout-btn:hover {
+            background: #dc2626;
+        }
+
+        .demo-note {
+            background: #fef3c7;
+            border: 1px solid #fbbf24;
+            color: #92400e;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 2rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 SiteOptz.ai</h1>
+            <p>AI-Powered SEO Automation Platform</p>
+        </div>
+
+        <div class="nav-buttons">
+            <a href="#login" class="nav-btn">Login</a>
+            <a href="#register" class="nav-btn">Register</a>
+            <button onclick="testAuth()" class="nav-btn">Test Authentication</button>
+        </div>
+
+        <div class="dashboard-links">
+            <h2>Dashboard Access</h2>
+            <div class="links-grid">
+                <div class="dashboard-card">
+                    <h3>Free Plan</h3>
+                    <p>Basic features for getting started</p>
+                    <a href="https://optz.siteoptz.ai/dashboard/free">Go to Dashboard →</a>
+                </div>
+                <div class="dashboard-card">
+                    <h3>Starter Plan</h3>
+                    <p>$29/month - Perfect for small agencies</p>
+                    <a href="https://optz.siteoptz.ai/dashboard/starter">Go to Dashboard →</a>
+                </div>
+                <div class="dashboard-card">
+                    <h3>Pro Plan</h3>
+                    <p>$99/month - Scale your agency</p>
+                    <a href="https://optz.siteoptz.ai/dashboard/pro">Go to Dashboard →</a>
+                </div>
+                <div class="dashboard-card">
+                    <h3>Enterprise Plan</h3>
+                    <p>Custom pricing for large agencies</p>
+                    <a href="https://optz.siteoptz.ai/dashboard/enterprise">Go to Dashboard →</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-note">
+            <strong>📝 Demo Note:</strong> This page demonstrates hash-based authentication routing.
+            Click "Login" or "Register" above to see the authentication forms.
+        </div>
+    </div>
+
+    <div id="user-info" class="user-info">
+        <h4>Current User</h4>
+        <p>Email: <span id="user-email">Not logged in</span></p>
+        <p>Plan: <span id="user-plan">-</span></p>
+        <button class="logout-btn" onclick="window.location.hash='#logout'">Logout</button>
+    </div>
+
+    <!-- Include the authentication script -->
+    <script src="siteoptz-auth-integration.js"></script>
+
+    <script>
+        // Test authentication function
+        function testAuth() {
+            if (window.SiteOptzAuth) {
+                const user = window.SiteOptzAuth.getCurrentUser();
+                if (user) {
+                    alert(`Logged in as: ${user.email}\nPlan: ${user.plan}`);
+                } else {
+                    alert('Not logged in. Click Login to authenticate.');
+                }
+            }
+        }
+
+        // Update user info display
+        function updateUserInfo() {
+            if (window.SiteOptzAuth) {
+                const user = window.SiteOptzAuth.getCurrentUser();
+                const userInfoDiv = document.getElementById('user-info');
+                
+                if (user && user.authenticated) {
+                    document.getElementById('user-email').textContent = user.email;
+                    document.getElementById('user-plan').textContent = user.plan;
+                    userInfoDiv.classList.add('active');
+                } else {
+                    userInfoDiv.classList.remove('active');
+                }
+            }
+        }
+
+        // Check for user on page load and hash changes
+        window.addEventListener('hashchange', updateUserInfo);
+        window.addEventListener('load', updateUserInfo);
+
+        // Example of programmatic authentication
+        window.loginExample = function() {
+            if (window.SiteOptzAuthAPI) {
+                // This would be called from your own forms
+                window.SiteOptzAuthAPI.login('test@example.com', 'password123');
+            }
+        };
+
+        window.registerExample = function() {
+            if (window.SiteOptzAuthAPI) {
+                // This would be called from your own forms
+                window.SiteOptzAuthAPI.register('John Doe', 'john@example.com', 'password123', 'pro');
+            }
+        };
+    </script>
+</body>
+</html>

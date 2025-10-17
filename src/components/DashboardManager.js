@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
 import CyfeService from '../services/CyfeService';
 import CyfeDashboard from './CyfeDashboard';
 import './DashboardManager.css';
 
 const DashboardManager = () => {
+  const navigate = useNavigate();
   const { currentPlan } = useUser();
   const [availableDashboards, setAvailableDashboards] = useState([]);
   const [selectedDashboard, setSelectedDashboard] = useState(null);
@@ -45,7 +47,7 @@ const DashboardManager = () => {
 
   const handleUpgradeClick = () => {
     // This would trigger your upgrade flow
-    window.location.href = `/dashboard/${currentPlan}#upgrade`;
+    navigate(`/dashboard/${currentPlan}#upgrade`);
   };
 
   return (

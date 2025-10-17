@@ -1,27 +1,29 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useStripe } from '../contexts/StripeContext';
 import { pricingPlans, upgradeFeatures } from '../pricing-plans';
 import './DashboardPage.css';
 
 const ProDashboard = () => {
+  const navigate = useNavigate();
   const { openUpgradeModal } = useStripe();
   const [isUpgrading, setIsUpgrading] = useState(false);
   
-  // Force navigation to AI SEO - bypass everything
+  // Handle AI SEO navigation properly with React Router
   React.useEffect(() => {
     const handleAISEOClick = (e) => {
       if (e.target.closest('[data-aiseo-link]')) {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
-        window.location.pathname = '/dashboard/pro/aiseo';
+        navigate('/dashboard/pro/aiseo');
         return false;
       }
     };
     
     document.addEventListener('click', handleAISEOClick, true);
     return () => document.removeEventListener('click', handleAISEOClick, true);
-  }, []);
+  }, [navigate]);
 
   const handleUpgrade = async () => {
     setIsUpgrading(true);

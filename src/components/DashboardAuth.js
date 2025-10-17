@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
 import CyfeService from '../services/CyfeService';
 import './DashboardAuth.css';
 
 const DashboardAuth = ({ children, dashboardId, requiredPlan }) => {
+  const navigate = useNavigate();
   const { user, currentPlan } = useUser();
   const [hasAccess, setHasAccess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -60,7 +62,7 @@ const DashboardAuth = ({ children, dashboardId, requiredPlan }) => {
         <p>{error}</p>
         <button 
           className="upgrade-button"
-          onClick={() => window.location.href = `/dashboard/${currentPlan}#upgrade`}
+          onClick={() => navigate(`/dashboard/${currentPlan}#upgrade`)}
         >
           Upgrade Plan
         </button>
@@ -76,7 +78,7 @@ const DashboardAuth = ({ children, dashboardId, requiredPlan }) => {
         <p>This dashboard is not included in your current plan.</p>
         <button 
           className="upgrade-button"
-          onClick={() => window.location.href = `/dashboard/${currentPlan}#upgrade`}
+          onClick={() => navigate(`/dashboard/${currentPlan}#upgrade`)}
         >
           View Upgrade Options
         </button>

@@ -12,6 +12,7 @@ import AISEOProtected from './components/AISEOProtected';
 import LoginForm from './components/LoginForm';
 import GetStartedForm from './components/GetStartedForm';
 import PlanProtectedRoute from './components/PlanProtectedRoute';
+import NavigationLogger from './components/NavigationLogger';
 import './App.css';
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
     <StripeProvider>
       <UserProvider>
         <Router>
+          <NavigationLogger />
           <div className="App">
             <Routes>
               {/* Authentication Routes */}

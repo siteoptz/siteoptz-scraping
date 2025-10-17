@@ -39,9 +39,10 @@ export const UserProvider = ({ children }) => {
             }
           } catch (error) {
             console.error('User verification failed:', error);
-            // Use cached data if verification fails
-            setUser(sessionUser);
-            setCurrentPlan(sessionUser.plan);
+            // Clear session if verification fails - don't use potentially stale data
+            AuthenticationService.clearUserSession();
+            setUser(null);
+            setCurrentPlan('free');
           }
         } else {
           // Check URL for SSO token (OAuth callback or GHL redirect)
