@@ -15,7 +15,7 @@
     GHL_API_KEY: 'pit-8954f181-e668-4613-80d6-c7b4aa8594b8',
     GHL_LOCATION_ID: 'ECu5ScdYFmB0WnhvYoBU',
     GHL_BASE_URL: 'https://services.leadconnectorhq.com',
-    DASHBOARD_BASE_URL: 'https://optz.siteoptz.ai/dashboard', // Update with your dashboard URL
+    DASHBOARD_BASE_URL: 'https://siteoptz.ai/dashboard', // Update with your dashboard URL
     
     // Plan tags in GoHighLevel
     PLAN_TAGS: {

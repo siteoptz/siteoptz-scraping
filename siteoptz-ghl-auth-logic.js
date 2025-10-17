@@ -30,10 +30,10 @@
     
     // Dashboard URLs
     DASHBOARD_URLS: {
-      free: 'https://optz.siteoptz.ai/dashboard/free',
-      starter: 'https://optz.siteoptz.ai/dashboard/starter',
-      pro: 'https://optz.siteoptz.ai/dashboard/pro',
-      enterprise: 'https://optz.siteoptz.ai/dashboard/enterprise'
+      free: 'https://siteoptz.ai/dashboard/free',
+      starter: 'https://siteoptz.ai/dashboard/starter',
+      pro: 'https://siteoptz.ai/dashboard/pro',
+      enterprise: 'https://siteoptz.ai/dashboard/enterprise'
     }
   };
 
