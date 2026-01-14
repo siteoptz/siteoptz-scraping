@@ -12,12 +12,6 @@ import AISEOProtected from './components/AISEOProtected';
 import LoginForm from './components/LoginForm';
 import GetStartedForm from './components/GetStartedForm';
 import PlanProtectedRoute from './components/PlanProtectedRoute';
-
-// Kids-AI Components
-import KidsAIDirectory from './pages/KidsAIDirectory';
-import StoryCreator from './pages/kids-ai-apps/StoryCreator';
-import MathWizard from './pages/kids-ai-apps/MathWizard';
-
 import './App.css';
 
 function App() {
@@ -80,12 +74,6 @@ function App() {
               
               {/* Legacy AI SEO route - redirects to new location */}
               <Route path="/ai-seo" element={<Navigate to="/dashboard/pro/aiseo" replace />} />
-              
-              {/* Kids-AI Routes - Public Access */}
-              <Route path="/kids-ai" element={<KidsAIDirectory />} />
-              <Route path="/kids-ai/directory" element={<KidsAIDirectory />} />
-              <Route path="/kids-ai/apps/story-creator" element={<StoryCreator />} />
-              <Route path="/kids-ai/apps/math-wizard" element={<MathWizard />} />
               
               {/* Default redirect - go to login if not authenticated */}
               <Route path="/" element={<Navigate to="/login" replace />} />
